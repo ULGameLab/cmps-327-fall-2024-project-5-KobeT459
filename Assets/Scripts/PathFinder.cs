@@ -58,8 +58,31 @@ public class PathFinder
             // You just need to fill code inside this foreach only
             foreach (Tile nextTile in current.tile.Adjacents)
             {
-                
+
+                // Skip this tile if it's already processed
+                if (DoneList.Exists(n => n.tile == nextTile))
+                    continue;
+
+                double gCost = current.costSoFar + 10; // Move cost (G cost)
+
+                // Check if the next tile is already in the TODO list
+                Node existingNode = TODOList.Find(n => n.tile == nextTile);
+                double hCost = HeuristicsDistance(nextTile, goal);
+                double fCost = gCost + hCost;
+
+                if (existingNode == null || gCost < existingNode.costSoFar)
+                {
+                    // Create a new node or update the existing node with better cost
+                    Node neighborNode = new Node(nextTile, fCost, current, gCost);
+
+                    if (existingNode != null)
+                    {
+                        TODOList.Remove(existingNode);
+                    }
+                    TODOList.Add(neighborNode);
+                }
             }
+        
         }
         return new Queue<Tile>(); // Returns an empty Path if no path is found
     }
