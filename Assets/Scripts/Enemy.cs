@@ -199,89 +199,8 @@ public class Enemy : MonoBehaviour
     // TODO: Third behavior (Describe what it does)
     private void HandleEnemyBehavior3()
     {
-        switch (state)
-        {
-            case EnemyState.DEFAULT:
-                material.color = Color.magenta;
 
-                float distanceToPlayer = Vector3.Distance(transform.position, playerGameObject.transform.position);
-                if (distanceToPlayer <= visionDistance)
-                {
-                    Tile playerTile = playerGameObject.GetComponent<Player>().currentTile;
-                    targetTile = GetTileAFewStepsAway(playerTile, 2);
-
-                    if (targetTile != null)
-                    {
-                        path = pathFinder.FindPath(currentTile, targetTile);
-                        state = EnemyState.CHASE;
-                    }
-                }
-                else
-                {
-                    if (path.Count <= 0) path = pathFinder.RandomPath(currentTile, 15);
-
-                    if (path.Count > 0)
-                    {
-                        targetTile = path.Dequeue();
-                        state = EnemyState.MOVING;
-                    }
-                }
-                break;
-
-            case EnemyState.CHASE:
-                if (path.Count > 0)
-                {
-                    targetTile = path.Dequeue();
-                    state = EnemyState.MOVING;
-                }
-                else
-                {
-                    state = EnemyState.DEFAULT;
-                }
-                break;
-
-            case EnemyState.MOVING:
-                velocity = targetTile.transform.position - transform.position;
-                transform.position += (velocity.normalized * speed) * Time.deltaTime;
-
-                if (Vector3.Distance(transform.position, targetTile.transform.position) <= 0.05f)
-                {
-                    currentTile = targetTile;
-                    state = EnemyState.DEFAULT;
-                }
-                break;
-
-            default:
-                state = EnemyState.DEFAULT;
-                break;
-        }
     }
-
-    private Tile GetTileAFewStepsAway(Tile playerTile, int stepsAway)
-    {
-        Vector3 direction = (currentTile.transform.position - playerTile.transform.position).normalized;
-        Vector3 targetPosition = playerTile.transform.position + direction * stepsAway;
-
-        Tile closestTile = null;
-        float closestDistance = float.MaxValue;
-
-        foreach (Transform child in GameObject.Find("MapGenerator").transform)
-        {
-            Tile tile = child.GetComponent<Tile>();
-            if (tile.mapTile.Walkable)
-            {
-                float distance = Vector3.Distance(tile.transform.position, targetPosition);
-                if (distance < closestDistance)
-                {
-                    closestTile = tile;
-                    closestDistance = distance;
-                }
-            }
-        }
-
-        return closestTile;
-    }
-
 
 
 }
